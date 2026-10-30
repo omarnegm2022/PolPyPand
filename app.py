@@ -114,7 +114,7 @@ with st.sidebar.container():
 
 		
 		st.info(f"Predicted File Size: {predicted_size_mb:.6f} MB")
-		if predicted_size_mb / 1024 > 1:  # TODO: not accurate!!!
+		if predicted_size_mb / 1024 > 0.9:  # TODO: not accurate!!!
 			st.error("""You are on the risk crashing the session.
 							Stay below 900 MB, Or....
 				""")
