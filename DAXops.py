@@ -91,11 +91,11 @@ def init_log(usr_name):
 	global log_file_name, logger
 	if log_file_name == 'log.jsonl':
 		log_file_name = "bench_" + usr_name + log_file_name
-		handler = logging.FileHandler(log_file_name, mode="a", encoding="utf-8")
-		handler.setFormatter(JSONFormatter())
+	handler = logging.FileHandler(log_file_name, mode="a", encoding="utf-8")
+	handler.setFormatter(JSONFormatter())
 		
-		logger.setLevel(logging.INFO)
-		logger.addHandler(handler)
+	logger.setLevel(logging.INFO)
+	logger.addHandler(handler)
 	return log_file_name
 # Simulate log events
 # logger.warning("High memory usage detected", extra={"user_id": "admin", "duration_ms": 450.1})
