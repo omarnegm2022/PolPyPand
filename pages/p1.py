@@ -122,23 +122,24 @@ with st.sidebar.container() as monitors:
 #3rd solution: st.columns
 Arguments = set()
 if dax_formula[-1][0] == 'DISTINCTCOUNT':#in col_only:
-    Arguments.add("Select any column from the table shown:")
+    Arguments.add("\nCopy & paste any column name from the table shown:")
 else:
-    Arguments.add("\nSelect a numerical column from the table shown: (float or integer)")
+    Arguments.add("\nCopy & paste a numerical column name from the table shown: (float or integer)")
 st.session_state.pd_stats, st.session_state.pl_stats = 0,0
 with st.sidebar.container() as mons:
     
     dax_formula.append(st.text_input("Arguments:-"))
     st.text(f"{''.join(Arguments)}")
     # st.text()
-    if dax_formula[-2][0] == 'DISTINCTCOUNT' and dax_formula[-1].title().strip() not in [''] + df_view['column'].to_list():
+    if dax_formula[-2][0] == 'DISTINCTCOUNT' and dax_formula[-1].strip() not in [''] + df_view['column'].to_list():
         st.error("Invalid column!")
-    elif dax_formula[-1].title().strip() not in ([''] + """Account Length (in months)
+    elif dax_formula[-2][0] != 'DISTINCTCOUNT' and dax_formula[-1].title().strip() not in ([''] + """Account Length (in months)
 Local Calls
 Local Mins
 Intl Calls
 Intl Mins
 Extra International Charges
+Number of Customers in Group
 Customer Service Calls
 Avg Monthly GB Download
 Unlimited Data Plan
@@ -150,39 +151,45 @@ Total Charges""".split('\n')):
         st.markdown(":red[not a numerical attribute!]")
 fun_apply = st.sidebar.button("Apply")
 # st.divider()
-if fun_apply:
-    # st.session_state.disabled = False
-    if dax_formula[0][0] == "MxMn":
-        st.sidebar.write("""DAX syntax (to get maximum value:\n\n""" f"""`MAX(Databel[{', '.join(dax_formula[-1:])}])`""")
-    else:
-        st.sidebar.write("""DAX syntax:\n\n""" f"""`{dax_formula[0][0]}(Databel[{', '.join(dax_formula[-1:])}])`""")
-    mat = Matistical(dax_formula[-1])
-    # print(dax_formula, getattr(mat,dax_formula[-2][0],None))
-    dax_formula = list(getattr(mat,dax_formula[-2][0])())
-    st.session_state.pd_stats, st.session_state.pl_stats = dax_formula
-    if st.session_state.pd_stats[0] != st.session_state.pl_stats[0]:
-        # print("diff!")
-        st.warning(f"Pandas returns: {st.session_state.pd_stats[0]}",'\n',f"Polars: {st.session_state.pl_stats[0]}")
-    else:
-        st.sidebar.text(f"Result: {st.session_state.pd_stats[0]}")
-    # st.sidebar.text(f"Result:\n {dax_formula}")    
-
-    comparison_data = {
-    """""": ('### :green[⏱️] :grey[Time] :grey[Execution]','### :green[💾] :grey[RAM] :grey[Usage]'),
-    """# :green[🐻‍❄️]\n## Pola.rs""": [f"{st.session_state.pl_stats[1]}",
-     f"{'\n'.join(st.session_state.pl_stats[2:])}"],
-    """# :green[🐼]\n## Pandas""": [f"{st.session_state.pd_stats[1]}", 
-    f"{'\n'.join(st.session_state.pd_stats[2:])}"],
-
-
-}
-    st.table(comparison_data)
+log_file = ''
+print(dax_formula,df_view['column'].to_list())
+@st.fragment
+def calc():
+    global dax_formula
+    if fun_apply:
+        st.query_params.update({"logFile": init_log(f"@{st.query_params["fileName"].split('@')[1]}@")})
+        st.sidebar.success("Scroll the page down to the results ↘️")
+        # st.session_state.disabled = False
+        if dax_formula[0][0] == "MxMn":
+            st.sidebar.write("""DAX syntax (to get maximum value:\n\n""" f"""`MAX(Databel[{', '.join(dax_formula[-1:])}])`""")
+        else:
+            st.sidebar.write("""DAX syntax:\n\n""" f"""`{dax_formula[0][0]}(Databel[{', '.join(dax_formula[-1:])}])`""")
+        mat = Matistical(dax_formula[-1])
+        # print(dax_formula, getattr(mat,dax_formula[-2][0],None))
+        dax_formula = list(getattr(mat,dax_formula[-2][0])())
+        st.session_state.pd_stats, st.session_state.pl_stats = dax_formula
+        if st.session_state.pd_stats[0] != st.session_state.pl_stats[0]:
+            # print("diff!")
+            st.warning(f"Pandas returns: {st.session_state.pd_stats[0]}",'\n',f"Polars: {st.session_state.pl_stats[0]}")
+        else:
+            st.sidebar.text(f"Result: {st.session_state.pd_stats[0]}")
+        # st.sidebar.text(f"Result:\n {dax_formula}")    
+    
+        comparison_data = {
+        """""": ('### :green[⏱️] :grey[Time] :grey[Execution]','### :green[💾] :grey[RAM] :grey[Usage]'),
+        """# :green[🐻‍❄️]\n## Pola.rs""": [f"{st.session_state.pl_stats[1]}",
+         f"{'\n'.join(st.session_state.pl_stats[2:])}"],
+        """# :green[🐼]\n## Pandas""": [f"{st.session_state.pd_stats[1]}", 
+        f"{'\n'.join(st.session_state.pd_stats[2:])}"],
+        }
+        st.table(comparison_data)
     # logging.debug(st.session_state.pd_stats); logging.debug(st.session_state.pl_stats)
 
 
 # st.session_state.pd_stats, st.session_state.pl_stats = dax_formula 
     #Back to the previous value since there is sync of states between the button
 
+calc()
 
 # First row: two columns
 with st.sidebar.container(border=True):
@@ -199,7 +206,7 @@ with st.sidebar.container(border=True):
         if st.button("Verdict >"):
             st.session_state.progress = 100
             st.session_state.path = ".\\Verdict"
-            st.switch_page("pages/p2.py")
+            st.switch_page("pages/p2.py", query_params={"logFile":st.query_params['logFile']})
 
 import psutil
 

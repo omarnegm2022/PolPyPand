@@ -32,11 +32,11 @@ tab1, tab2, tab3 = st.tabs([
         """🍫 bar""",
     ])
 try:
-    df = pd.read_json("bench_log.jsonl", lines=True)#Gemini hallucination>> ,comment="#")
+    df = pd.read_json(st.query_params["logFile"], lines=True)#Gemini hallucination>> ,comment="#")
 except ValueError:
     import json
 #
-    with open("bench_log.jsonl",'r') as file_to_chk:
+    with open(st.query_params["logFile"],'r') as file_to_chk:
         df = pd.DataFrame([json.loads(line) for line in file_to_chk if not line.strip().startswith("�")])
 
 with tab1:
@@ -80,14 +80,14 @@ with tab3:
 with st.sidebar:
     st.title("Benchmarking tools:\n#")
     st.markdown(
-    '### <tt style="font-family: monospace; font-weight: normal;">`timeit` — Measure execution time of small code snippets</tt>\n\n > :blue[to find memory leaks, analyze memory usage]', 
+    '### <tt style="font-family: monospace; font-weight: normal;">`timeit` — Measure execution time of small code snippets</tt>', 
     unsafe_allow_html=True
 )
     st.markdown("**Source code:** [Lib/timeit.py](https://github.com/python/cpython/blob/3.15/Lib/timeit.py)")
   # st.markdown('***')
     st.divider()
     st.markdown(
-    '### <tt style="font-family: monospace; font-weight: normal;">`tracemalloc` — Trace memory allocations</tt>', 
+    '### <tt style="font-family: monospace; font-weight: normal;">`tracemalloc` — Trace memory allocations</tt>\n\n > :yellow[*current* memory is the memory the code is currently using,uses and *peak* memory is the maximum space the program used while executing.]', 
     unsafe_allow_html=True
 )
     st.markdown("**Source code:** [Lib/tracemalloc.py](https://github.com/python/cpython/blob/3.15/Lib/tracemalloc.py)")
@@ -101,7 +101,16 @@ st.write("""# Relevant articles:
 * [DuckDB 2.0 vs Polars 2.0 vs pandas 3.0: benchmarks on a billion rows](https://plotly.com/blog/duckdb-vs-polars-vs-pandas/)""")
 
 
+# if __name__ == "__main__":
+#     st.set_option("client.showSidebarNavigation", False)
 
+#     df = pd.read_json(
+#     "log_file.jsonl", lines=True
+#     #A standard JSON file is structured as a single large array of objects 
+#     # (e.g., [{"a": 1}, {"a": 2}]). pd.read_json() expects this by default.
+# #>> .jsonl (JSON Lines or newline-delimited JSON)
+# )
+#     print(df.dtypes)  # 'timestamp' will be datetime64[ns]
 
 # Plot directly
     # fig = px.bar(df, x="timestamp", y="duration_ms")

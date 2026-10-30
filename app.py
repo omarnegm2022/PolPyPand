@@ -31,7 +31,7 @@ st.set_page_config(
     page_icon="📐",
     # layout="wide",
 )
-
+usr_mail = st.sidebar.text_input("Enter your email for better experience: ").split('@')[0]
 if "progress" not in st.session_state or "path" not in st.session_state:
     st.session_state.progress = 0
     st.session_state.path = """`Home\\`"""
@@ -125,9 +125,13 @@ with st.sidebar.container():
 				, opened in the extracted project folder.
 				""")
 		elif not to_proceed:# st.button("Apply?"):
-			new_file_name = "bench_" + file_name
+			new_file_name = "bench_" + f"@{usr_mail}@" + file_name 
 			try:
-				with open(new_file_name, 'x') as file_to_write:
+				write_mode = 'x'
+				if os.path.exists(new_file_name):
+					write_mode = 'w'
+					print("write mode MODIFIED!")
+				with open(new_file_name, write_mode) as file_to_write:
 					file_to_write.write(header)
 					with st.spinner("Augmenting..."):
 						for rep in range(required_multiplier):
@@ -138,8 +142,8 @@ with st.sidebar.container():
 						f""":red[{new_file_name}: {e!s}🥲]""" + "For now, we are using the original dataset.", 
 						len(rows_original)
 					)
-					# st.query_params.from_dict({"fileName": file_name})
-					st.switch_page("pages/p1.py", query_params={"fileName": new_file_name})
+					st.query_params.from_dict({"usrTag": usr_mail})
+					st.switch_page("pages/p1.py", query_params={"fileName": new_file_name,})
 			# except PermissionError:
 			# 	file_status_container.warning("Error: OS permissions prevent reading metadata for this file.")
 			# except TypeError:

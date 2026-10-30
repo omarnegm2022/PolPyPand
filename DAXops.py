@@ -57,20 +57,10 @@ class JSONFormatter(logging.Formatter):
                 
         return json.dumps(log_record)
 
-# Setup file handler
-
-handler = logging.FileHandler("bench_log.jsonl", mode="a", encoding="utf-8")
-handler.setFormatter(JSONFormatter())
-
-logger = logging.getLogger("StructuredApp")
-logger.setLevel(logging.INFO)
-logger.addHandler(handler)
-
-# Simulate log events
-# logger.warning("High memory usage detected", extra={"user_id": "admin", "duration_ms": 450.1})
 
 
 df_map = dict()
+log_file_name = 'log.jsonl'
 def prep_dataset(file_name):	
 	global pd_df, pl_df, df_map 	
 	tracemalloc.start()
@@ -91,7 +81,25 @@ def prep_dataset(file_name):
     'bool': pl.Boolean
 }#for custom schema overriding method*
 	df_map = {"pandas": pd_df, "polars": pl_df}
+	 
 	return pl_df.glimpse(return_type="frame")
+
+
+# Setup file handler
+logger = logging.getLogger("StructuredApp")
+def init_log(usr_name):
+	global log_file_name, logger
+	if log_file_name == 'log.jsonl':
+		log_file_name = "bench_" + usr_name + log_file_name
+		handler = logging.FileHandler(log_file_name, mode="a", encoding="utf-8")
+		handler.setFormatter(JSONFormatter())
+		
+		logger.setLevel(logging.INFO)
+		logger.addHandler(handler)
+	return log_file_name
+# Simulate log events
+# logger.warning("High memory usage detected", extra={"user_id": "admin", "duration_ms": 450.1})
+
 	
 				#infer_schema_length=pl.scan_csv(file_name).select(pl.len()).collect().item())
 				#infer_schema_length=pd_df.shape[0])
