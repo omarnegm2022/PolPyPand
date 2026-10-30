@@ -101,16 +101,7 @@ st.write("""# Relevant articles:
 * [DuckDB 2.0 vs Polars 2.0 vs pandas 3.0: benchmarks on a billion rows](https://plotly.com/blog/duckdb-vs-polars-vs-pandas/)""")
 
 
-if __name__ == "__main__":
-    st.set_option("client.showSidebarNavigation", False)
 
-    df = pd.read_json(
-    "log_file.jsonl", lines=True
-    #A standard JSON file is structured as a single large array of objects 
-    # (e.g., [{"a": 1}, {"a": 2}]). pd.read_json() expects this by default.
-#>> .jsonl (JSON Lines or newline-delimited JSON)
-)
-    print(df.dtypes)  # 'timestamp' will be datetime64[ns]
 
 # Plot directly
     # fig = px.bar(df, x="timestamp", y="duration_ms")
