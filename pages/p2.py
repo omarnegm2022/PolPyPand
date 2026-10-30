@@ -26,6 +26,7 @@ st.set_page_config(
 
 # bar = st.sidebar.progress(st.session_state.progress)
 st.title("Hover over the canvas in each tab for more controls and to read the tooltips.")
+st.info("To add more calculations: 👇")
 tab1, tab2, tab3 = st.tabs([
         "📶 Histogram",
         """🥧 Pie""",
@@ -77,6 +78,9 @@ with tab3:
     with st.container(border=True):
         event_data = st.plotly_chart(fig, on_select="rerun")
 # st.write(event_data)
+if st.button("<< Set another benchmark"):
+    st.switch_page("app.py")
+    # st.switch_page("pages/p1.py",query_params=st.query_params)
 with st.sidebar:
     st.title("Benchmarking tools:\n#")
     st.markdown(
